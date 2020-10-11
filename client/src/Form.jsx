@@ -1,24 +1,27 @@
 import React, { Component } from 'react';
 import HeaderMain from './Header';
 import HeaderSub from './Subheader';
-import Describe from './Describe';
+import DatePicker from './Datepicker';
 import Requirement from './Requirement';
 import ChoiceTask from './ChoiceTask';
 import DesicionTask from './DecisionTask';
 import SentenceTask from './SentenceTask';
-import { Form, Radio, Button} from 'semantic-ui-react';
+import { Form, Radio, Button, Input} from 'semantic-ui-react';
 
 export default class FormMain extends Component {
   state = {};
-  handleChange = (e, { value, title, description, date, choiceTask, decisionTask, sentenceTask, options, masterWorkers, reward, workerNumber }) => this.setState({ value, title, description, date, choiceTask, decisionTask, sentenceTask, options, masterWorkers, reward, workerNumber });
+  handleChange = (e, { value }) => this.setState({ value });
 
   constructor(props) {
     super(props);
     this.state = {
-      type: "",
+      taskType: "",
       title: "",
       description: "",
       date: "",
+      sentenceTask:"",
+      choiceTask:"",
+      decisionTask:"",
       masterWorkers: "",
       reward: "",
       workerNumber: "",
@@ -36,7 +39,7 @@ export default class FormMain extends Component {
         method:'post',
         headers:{'Content-Type':'application/json'},
         body:JSON.stringify({
-            type: this.state.value,
+            taskType: this.state.value,
             title: this.state.title,
             description: this.state.description,
             date: this.state.date,
@@ -63,7 +66,8 @@ export default class FormMain extends Component {
         <Form.Field>
           <Radio
             label='Choice Task'
-            name='radioGroup'
+            className = 'taskType'
+            name='taskType'
             value='Choice Task'
             checked={this.state.value === 'Choice Task'}
             onChange={this.handleChange}
@@ -72,7 +76,8 @@ export default class FormMain extends Component {
         <Form.Field>
           <Radio
             label='Decision-Making Task'
-            name='radioGroup'
+            className = 'taskType'
+            name='taskType'
             value='Decision-Making Task'
             checked={this.state.value === 'Decision-Making Task'}
             onChange={this.handleChange}
@@ -81,7 +86,8 @@ export default class FormMain extends Component {
         <Form.Field>
           <Radio
             label='Sentence-Level Task'
-            name='radioGroup'
+            className = 'taskType'
+            name='taskType'
             value='Sentence-Level Task'
             checked={this.state.value === 'Sentence-Level Task'}
             onChange={this.handleChange}
@@ -89,7 +95,24 @@ export default class FormMain extends Component {
         </Form.Field>
         </div>
         <HeaderSub text = "Describe your task to Workers"/>
-        <Describe />
+        <div>
+                <div style = {{display: 'flex'}}>
+                    <h3 style = {{width : 100}}>Title</h3>
+                    <Input placeholder = 'Enter Task Title' style = {{width : 200}} name = "title" onChange = {this.handleInputChange}>
+                        
+                    </Input>
+                </div>
+                <div style = {{display: 'flex'}}>
+                    <h3 style = {{width : 100}}>Description</h3>
+                    <Input placeholder = 'Enter Task Description' style = {{width : 400}} name = "description" onChange = {this.handleInputChange}>
+                        
+                    </Input>
+                </div>
+                <div style = {{display: 'flex'}}>
+                    <h3 style = {{width : 100}} name = "date" onChange = {this.handleInputChange}>Expire Date</h3>
+                    <DatePicker/>
+                </div>
+            </div>
         <HeaderSub text = "Setting up your Task"/>
         {(() => {
         switch (this.state.value) {

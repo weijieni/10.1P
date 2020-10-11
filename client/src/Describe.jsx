@@ -33,7 +33,7 @@ class Describe extends Component {
                 </div>
                 <div style = {{display: 'flex'}}>
                     <h3 style = {{width : 100}}>Description</h3>
-                    <Input placeholder = 'Enter Task Description' style = {{width : 400}} onChange = {this.handleInputChange}>
+                    <Input placeholder = 'Enter Task Description' style = {{width : 400}} name = "description" onChange = {this.handleInputChange}>
                         
                     </Input>
                 </div>
