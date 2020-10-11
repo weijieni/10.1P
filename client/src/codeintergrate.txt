@@ -1,0 +1,450 @@
+//App.js
+import React from 'react';
+import Form from './Form';
+import {Container} from "semantic-ui-react";
+import './App.css';
+
+function App() {
+  
+  return (
+    <Container>
+      <Form />
+      
+    </Container>    
+  );
+}
+
+export default App;
+
+//Checkbox.jsx
+import React from 'react'
+
+export const CheckBox = props => {
+    return (
+      <div>
+       <input key={props.id} onClick={props.handleCheckChieldElement} type="checkbox" checked={props.isChecked} value={props.value} /> {props.value}
+      </div>
+    )
+}
+
+export default CheckBox
+
+//ChoiceTask.jsx
+import React, { Component } from 'react';
+import { Form} from 'semantic-ui-react';
+import CheckBox from './Checkbox';
+
+export default class ChoiceTask extends Component {
+
+    constructor(props) {
+        super(props)
+        this.state = {
+          choice: [
+            {id: 1, value: "Choice 1", isChecked: false},
+            {id: 2, value: "Choice 2", isChecked: false},
+            {id: 3, value: "Choice 3", isChecked: false},
+            {id: 4, value: "Choice 4", isChecked: false}
+          ]
+        }
+      }
+
+    handleCheckChieldElement = (event) => {
+        let choice = this.state.choice
+        choice.forEach(choices => {
+        if (choices.value === event.target.value)
+            choices.isChecked =  event.target.checked
+        })
+        this.setState({choice: choice})
+    }
+  
+    render() {
+      return (
+        <Form>
+          <h3>Select The Choice Type For The Task</h3>
+          {
+          this.state.choice.map((choice) => {
+            return (<CheckBox handleCheckChieldElement={this.handleCheckChieldElement} {...choice} />)
+          })
+        }
+        </Form>
+      )
+    }
+  }
+  
+  //Datepicker.jsx
+  import React, { useState } from "react";
+import DatePicker from "react-datepicker";
+ 
+import "react-datepicker/dist/react-datepicker.css";
+ 
+ 
+const PickDate = () => {
+  const [startDate, setStartDate] = useState(new Date());
+  return (
+    <DatePicker selected={startDate} onChange={date => setStartDate(date)} />
+  );
+};
+
+export default PickDate;
+
+//DecisionTask.jsx
+import React, { Component } from 'react';
+import { Form, Radio} from 'semantic-ui-react';
+
+export default class DecisionTask extends Component {
+
+
+    state = {};
+    handleChange = (e, { value }) => this.setState({ value });
+  
+    render() {
+      return (
+        <Form>
+          <h3>Please choose True/False to listing decisions</h3>
+          <Form.Field name = 'Decision 1' style = {{marginLeft: 20}}>
+            <h4>Decision to be made</h4>
+            <Radio
+              label='True'
+              name='Decision'
+              value='True'
+              checked={this.state.value === 'True'}
+              onChange={this.handleChange}
+            />
+            <Radio
+              style = {{marginLeft: 20}}
+              label='False'
+              name='Decision'
+              value='False'
+              checked={this.state.value === 'False'}
+              onChange={this.handleChange}
+            />
+          </Form.Field>
+        </Form>
+      )
+    }
+  }
+  
+//Describe.jsx
+import React from 'react';
+import { Input } from 'semantic-ui-react';
+import { Component } from 'react';
+import DatePicker from './Datepicker';
+
+
+class Describe extends Component {
+    state = {}
+    
+    constructor(props) {
+        super(props);
+        this.state = {
+          title: "",
+          description: "",
+          date: "",
+        };
+      }
+
+    handleInputChange = (e) => {
+        this.setState({
+          [e.target.name]: e.target.value,
+        });
+    };
+    
+    render() {
+        return (
+            <div>
+                <div style = {{display: 'flex'}}>
+                    <h3 style = {{width : 100}}>Title</h3>
+                    <Input placeholder = 'Enter Task Title' style = {{width : 200}} name = "title" onChange = {this.handleInputChange}>
+                        
+                    </Input>
+                </div>
+                <div style = {{display: 'flex'}}>
+                    <h3 style = {{width : 100}}>Description</h3>
+                    <Input placeholder = 'Enter Task Description' style = {{width : 400}} name = "description" onChange = {this.handleInputChange}>
+                        
+                    </Input>
+                </div>
+                <div style = {{display: 'flex'}}>
+                    <h3 style = {{width : 100}}>Expire Date</h3>
+                    <DatePicker/>
+                </div>
+            </div>
+        )
+    }
+}
+
+export default Describe;
+
+//Form.jsx
+import React, { Component } from 'react';
+import HeaderMain from './Header';
+import HeaderSub from './Subheader';
+import DatePicker from './Datepicker';
+import Requirement from './Requirement';
+import ChoiceTask from './ChoiceTask';
+import DesicionTask from './DecisionTask';
+import SentenceTask from './SentenceTask';
+import { Form, Radio, Button, Input} from 'semantic-ui-react';
+
+export default class FormMain extends Component {
+  state = {};
+  handleChange = (e, { value }) => this.setState({ value });
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      taskType: "",
+      title: "",
+      description: "",
+      date: "",
+      sentenceTask:"",
+      choiceTask:"",
+      decisionTask:"",
+      masterWorkers: "",
+      reward: "",
+      workerNumber: "",
+    };
+  }
+
+  handleInputChange = (e) => {
+    this.setState({
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  handleUpload = ()=>{
+    fetch('http://localhost:4000/upload',{
+        method:'post',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+            taskType: this.state.value,
+            title: this.state.title,
+            description: this.state.description,
+            date: this.state.date,
+            choiceTask: this.state.choiceTask,
+            decisionTask: this.state.decisionTask,
+            sentenceTask: this.state.sentenceTask,
+            options: this.state.options,
+            masterWorkers: this.state.masterWorkers,
+            reward: this.state.reward,
+            workerNumber: this.state.workerNumber
+        })
+    })
+    .then(response=>response.json())
+    .then(data => console.log(data))
+    .catch(err => {console.log('Errors:'+err)})
+}
+
+  render() {
+    return (
+      <Form onSubmit = {this.handleUpload}>
+        <HeaderMain text = "New Requester Task" choice = {this.state.value}/>
+        <div style = {{display: 'flex', justifyContent: 'space-between'}}>
+        <h3>Select a task type: </h3>
+        <Form.Field>
+          <Radio
+            label='Choice Task'
+            className = 'taskType'
+            name='taskType'
+            value='Choice Task'
+            checked={this.state.value === 'Choice Task'}
+            onChange={this.handleChange}
+          />
+        </Form.Field>
+        <Form.Field>
+          <Radio
+            label='Decision-Making Task'
+            className = 'taskType'
+            name='taskType'
+            value='Decision-Making Task'
+            checked={this.state.value === 'Decision-Making Task'}
+            onChange={this.handleChange}
+          />
+        </Form.Field>
+        <Form.Field>
+          <Radio
+            label='Sentence-Level Task'
+            className = 'taskType'
+            name='taskType'
+            value='Sentence-Level Task'
+            checked={this.state.value === 'Sentence-Level Task'}
+            onChange={this.handleChange}
+          />
+        </Form.Field>
+        </div>
+        <HeaderSub text = "Describe your task to Workers"/>
+        <div>
+                <div style = {{display: 'flex'}}>
+                    <h3 style = {{width : 100}}>Title</h3>
+                    <Input placeholder = 'Enter Task Title' style = {{width : 200}} name = "title" onChange = {this.handleInputChange}>
+                        
+                    </Input>
+                </div>
+                <div style = {{display: 'flex'}}>
+                    <h3 style = {{width : 100}}>Description</h3>
+                    <Input placeholder = 'Enter Task Description' style = {{width : 400}} name = "description" onChange = {this.handleInputChange}>
+                        
+                    </Input>
+                </div>
+                <div style = {{display: 'flex'}}>
+                    <h3 style = {{width : 100}} name = "date" onChange = {this.handleInputChange}>Expire Date</h3>
+                    <DatePicker/>
+                </div>
+            </div>
+        <HeaderSub text = "Setting up your Task"/>
+        {(() => {
+        switch (this.state.value) {
+            case "Choice Task":   return <ChoiceTask/>;
+            case "Decision-Making Task": return <DesicionTask/>;
+            case "Sentence-Level Task":  return <SentenceTask/>;
+            default:      return <p>Please Select A Task Type</p>;
+          }
+        })()}        
+        <HeaderSub text = "Worker Requirement"/>
+        <Requirement/>
+        <Button type='submit' floated = "right">Save</Button>
+      </Form>
+    )
+  }
+}
+
+//Header.jsx
+import React from 'react';
+import { Header, Segment } from 'semantic-ui-react';
+import './App.css';
+import './Form';
+import { Component } from 'react';
+
+class HeaderMain extends Component{
+    render() {
+        return (
+            <Segment clearing inverted color = "grey">
+            <Header as='h2' floated='left'>
+                {this.props.text}
+            </Header>
+            <Header as='h2' color = "red" floated='right'>
+                {this.props.choice}
+            </Header>
+            </Segment>
+        )
+    }
+}  
+export default HeaderMain;
+
+//index.js
+import React from 'react';
+import ReactDOM from 'react-dom';
+import './index.css';
+import App from './App';
+import * as serviceWorker from './serviceWorker';
+
+
+const styleLink = document.createElement("link");
+styleLink.rel = "stylesheet";
+styleLink.href = "https://cdn.jsdelivr.net/npm/semantic-ui/dist/semantic.min.css";
+document.head.appendChild(styleLink);
+
+ReactDOM.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+  document.getElementById('root')
+);
+
+// If you want your app to work offline and load faster, you can change
+// unregister() to register() below. Note this comes with some pitfalls.
+// Learn more about service workers: https://bit.ly/CRA-PWA
+serviceWorker.unregister();
+
+
+//Requirement.jsx
+import React, { Component } from 'react';
+import { Form, Radio, Input} from 'semantic-ui-react';
+
+export default class Requirement extends Component {
+    state = {}
+    handleChange = (e, { value }) => this.setState({ value })
+  
+    render() {
+      return (
+        <Form>
+          <div style = {{display: 'flex'}}>
+          <h3>Require Master Workers </h3>
+          <Form.Field style = {{marginLeft: 20}}>
+            <Radio
+              label='Yes'
+              name='radioGroup'
+              value='Yes'
+              checked={this.state.value === 'Yes'}
+              onChange={this.handleChange}
+            />
+          </Form.Field>
+          <Form.Field  style = {{marginLeft: 20}}>
+            <Radio
+              label='No'
+              name='radioGroup'
+              value='No'
+              checked={this.state.value === 'No'}
+              onChange={this.handleChange}
+            />
+          </Form.Field>
+          </div>
+          <div style = {{display: 'flex'}}>
+          <h3 style = {{width : 200}}>Reward Per Response </h3>
+          <Form.Field style = {{marginLeft: 20}}>
+            <Input
+              placeholder = ""
+            />
+          </Form.Field>
+          </div>
+          <div style = {{display: 'flex'}}>
+          <h3 style = {{width : 200}}>Name Of Response </h3>
+          <Form.Field style = {{marginLeft: 20}}>
+            <Input
+              placeholder = ""
+            />
+          </Form.Field>
+          </div>
+        </Form>
+      )
+    }
+  }
+  
+
+//SentenceTask.jsx
+import React, { Component } from 'react';
+import { Form, TextArea} from 'semantic-ui-react';
+
+export default class SentenceTask extends Component {
+    state = {}
+    handleChange = (e, { value }) => this.setState({ value })
+  
+    render() {
+      return (
+        <Form>
+          <h3>Please translate following sentence into <b>Spanish</b></h3>
+          <p><b>This is a sample sentence</b></p>
+          <TextArea placeholder='Put your translation here' style={{ minHeight: 100 }} />
+        </Form>
+      )
+    }
+  }
+  
+
+//Subheader.jsx
+import React from 'react';
+import { Header, Segment } from 'semantic-ui-react';
+import { Component } from 'react';
+
+class HeaderSub extends Component{
+    render() {
+        return (
+            <Segment clearing inverted color = "grey">
+            <Header as='h2' floated='left'>
+                {this.props.text}
+            </Header>
+            </Segment>
+        )
+    }
+}  
+export default HeaderSub;
